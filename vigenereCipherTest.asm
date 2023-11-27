@@ -1,7 +1,7 @@
 # Vigenere Cipher in MIPS Assembly
 
 .data
-plaintext: .asciiz "THISISATESTFORTHECIPHER"      # Input plaintext
+plaintext: .asciiz "tEsT"      # Input plaintext
 key: .asciiz "KEY"              # Key for encryption
 newLine: .asciiz "\n"
 
@@ -50,6 +50,28 @@ vigenere:
 
 loop:
     lb $t4, ($t0)                # Load a character from plaintext
+    bge $t4, 97, lower
+    bge $t4, 65, upper
+lower:
+    beqz $t4, end                # If null terminator, exit loop
+
+    lb $t5, ($t1)                # Load a character from key
+    beqz $t5, reset_key          # If null terminator, reset key index
+
+    sub $t4, $t4, 97             # Convert plaintext character to 0-25 range
+    sub $t5, $t5, 65             # Convert key character to 0-25 range
+
+    add $t4, $t4, $t5            # Add plaintext and key characters
+    li $t6, 26                   # Constant for modulo operation
+    rem $t4, $t4, $t6            # Modulo 26 to keep within the alphabet range
+
+    add $t4, $t4, 97             # Convert back to ASCII range
+
+    sb $t4, ($t0)                # Store encrypted character back to plaintext
+    addi $t0, $t0, 1             # Move to the next character in plaintext
+    addi $t1, $t1, 1             # Move to the next character in key
+    j loop                       # Repeat for the next character
+upper:
     beqz $t4, end                # If null terminator, exit loop
 
     lb $t5, ($t1)                # Load a character from key
