@@ -6,7 +6,8 @@ key: .asciiz "KEY"              # Key for encryption
 newLine: .asciiz "\n"
 
 .text
-.globl main
+
+#TODO: add way to check for upper and lowercase keys so either 'key' or 'KEY'
 
 main:
     # Print original plaintext and key
