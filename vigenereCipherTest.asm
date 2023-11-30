@@ -4,23 +4,30 @@
 # Rules
 # message can be in any case
 # key must be uppercase, if not, convert to uppercase
-# skip
+# skip spaces and special characters in the message
 
-#TODO:  -simplify code with macros
-#	-decryption functionality
-#	-get message from file
+.include "utils.asm"
 
 .data
-
-plaintext: .asciiz "Thisisatest"      # Input plaintext
-key: .asciiz "KEY"              # Key for encryption
+filePrompt: .asciiz "Enter the input file name: "
+keyPrompt: .asciiz "Enter a key containing only letters (Max 50 chars): "
 newLine: .asciiz "\n"
+buffer: .space 51
+fin: .space 26
+file: .space 501
+fileError: .asciiz "Error opening the file. Please check the file name and try again."
 
 .text
 main:
+	getFile
+   getKey
+   la $s0, buffer
+   processKey($s0)
+   printStr(newLine)
+
     # Print original plaintext and key
     li $v0, 4                    # System call for print_str
-    la $a0, plaintext            # Load plaintext address
+    la $a0, file            # Load plaintext address
     syscall
     
     # Print original plaintext and key
@@ -29,7 +36,7 @@ main:
     syscall
 
     li $v0, 4                    # System call for print_str
-    la $a0, key                  # Load key address
+    move $a0, $s0                  # Load key address
     syscall
     
     # Print original plaintext and key
@@ -37,13 +44,13 @@ main:
     la $a0, newLine            # Load plaintext address
     syscall
 
-    la $a0, plaintext            # Load plaintext address
-    la $a1, key                  # Load key address
+    la $a0, file          # Load plaintext address
+    move $a1, $s0                  # Load key address
     jal encryption                # Call the vigenere function
 
     # Print encrypted plaintext
     li $v0, 4                    # System call for print_str
-    la $a0, plaintext            # Load encrypted plaintext address
+    la $a0, file            # Load encrypted plaintext address
     syscall
 
     # Exit program
@@ -59,11 +66,16 @@ encryption:
 
 loop:
     lb $t4, ($t0)                # Load a character from plaintext
-    bge $t4, 97, lower
-    bge $t4, 65, upper
-lower:
-    beqz $t4, end                # If null terminator, exit loop
+    beqz $t4, end		# checks if 
+    blt $t4, 65, skip             # If ASCII value is less than 'A', skip
+    bgt $t4, 122, skip            # If ASCII value is greater than 'z', skip
+    blt $t4, 97, upper            # If ASCII value is less than 'a', it's upper case
+    bgt $t4, 90, lower
 
+skip:	
+	addi $t0, $t0, 1
+	j loop                
+lower:
     lb $t5, ($t1)                # Load a character from key
     beqz $t5, reset_key          # If null terminator, reset key index
 
@@ -81,7 +93,6 @@ lower:
     addi $t1, $t1, 1             # Move to the next character in key
     j loop                       # Repeat for the next character
 upper:
-    beqz $t4, end                # If null terminator, exit loop
 
     lb $t5, ($t1)                # Load a character from key
     beqz $t5, reset_key          # If null terminator, reset key index
@@ -102,7 +113,7 @@ upper:
 
 reset_key:
     # Reset key index if end of key is reached
-    la $t1, key                  # Reload key address
+    move $t1, $s0                  # Reload key address
     li $t3, 0                    # Reset key index
     j loop                       # Continue encryption
 
