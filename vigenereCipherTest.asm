@@ -1,14 +1,22 @@
 # Vigenere Cipher in MIPS Assembly
+# The Gamblers - Joshua Estrada & Damian Varela
+
+# Rules
+# message can be in any case
+# key must be uppercase, if not, convert to uppercase
+# skip
+
+#TODO:  -simplify code with macros
+#	-decryption functionality
+#	-get message from file
 
 .data
-plaintext: .asciiz "tEsT"      # Input plaintext
+
+plaintext: .asciiz "Thisisatest"      # Input plaintext
 key: .asciiz "KEY"              # Key for encryption
 newLine: .asciiz "\n"
 
 .text
-
-#TODO: add way to check for upper and lowercase keys so either 'key' or 'KEY'
-
 main:
     # Print original plaintext and key
     li $v0, 4                    # System call for print_str
@@ -31,7 +39,7 @@ main:
 
     la $a0, plaintext            # Load plaintext address
     la $a1, key                  # Load key address
-    jal vigenere                 # Call the vigenere function
+    jal encryption                # Call the vigenere function
 
     # Print encrypted plaintext
     li $v0, 4                    # System call for print_str
@@ -43,7 +51,7 @@ main:
     syscall
 
 # Vigenere function
-vigenere:
+encryption:
     move $t0, $a0                # Copy plaintext address
     move $t1, $a1                # Copy key address
     li $t2, 0                    # Initialize counter for plaintext index
