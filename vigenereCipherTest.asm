@@ -4,7 +4,7 @@
 # Rules
 # message can be in any case
 # key must be uppercase, if not, convert to uppercase
-# skip spaces and special characters in the message
+# ignore spaces and special characters in the message
 
 .include "utils.asm"
 
@@ -16,6 +16,10 @@ buffer: .space 51
 fin: .space 26
 file: .space 501
 fileError: .asciiz "Error opening the file. Please check the file name and try again."
+plaintextText: .asciiz "The original plaintext is:\n\n"
+keyText: .asciiz "The key is: "
+ciphertextText: .asciiz "The ciphertext is:\n\n "
+divider: .asciiz "----------------------------------------------------------"
 
 .text
 main:
@@ -25,24 +29,28 @@ main:
    	processKey($s0)
    	printStr(newLine)
 
-    # Print original plaintext and key
-    	li $v0, 4                    # System call for print_str
-    	la $a0, file            # Load plaintext address
+	printStr(plaintextText)
+
+	# Print file contents
+    	li $v0, 4		
+    	la $a0, file            
     	syscall
 
-    # Print original plaintext and key
-    	li $v0, 4                    # System call for print_str
-    	la $a0, newLine            # Load plaintext address
-    	syscall
+ 	printStr(newLine)
+ 	printStr(divider)
+ 	printStr(newLine)
+	printStr(keyText)
 
+	# print key
     	li $v0, 4                    # System call for print_str
     	move $a0, $s0                  # Load key address
     	syscall
     
     # Print original plaintext and key
-    	li $v0, 4                    # System call for print_str
-    	la $a0, newLine            # Load plaintext address
-    	syscall
+	printStr(newLine)
+	printStr(divider)
+	printStr(newLine)
+	printStr(ciphertextText)
 
     	la $a0, file          # Load plaintext address
     	move $a1, $s0                  # Load key address
