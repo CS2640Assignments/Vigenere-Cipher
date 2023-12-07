@@ -18,7 +18,7 @@ file: .space 501
 fileError: .asciiz "Error opening the file. Please check the file name and try again."
 plaintextText: .asciiz "The original plaintext is:\n\n"
 keyText: .asciiz "The key is: "
-ciphertextText: .asciiz "The ciphertext is:\n\n "
+ciphertextText: .asciiz "The ciphertext is:\n\n"
 divider: .asciiz "----------------------------------------------------------"
 
 .text
@@ -75,15 +75,16 @@ encryption:
 loop:
     	lb $t4, ($t0)                # Load a character from plaintext
     	beqz $t4, end		# checks if 
-    	blt $t4, 65, skip             # If ASCII value is less than 'A', skip
-    	bgt $t4, 122, skip            # If ASCII value is greater than 'z', skip
-    	blt $t4, 97, upper            # If ASCII value is less than 'a', it's upper case
-    	bgt $t4, 90, lower
+    	blt $t4, 65, skip             # If ASCII value is less than 'A', skip, not a character
+    	bgt $t4, 122, skip            # If ASCII value is greater than 'z', skip, not a character
+    	blt $t4, 97, upper            # If ASCII value is less than 'a', it's in the upper case range
+    	bgt $t4, 90, lower            # If ASCII value is greater than ''Z' its in the lower case range
 
 skip:	
 	addi $t0, $t0, 1
 	j loop                
 lower:
+	blt $t4, 97, skip	     # skip characters in the middle (non-letters)
     	lb $t5, ($t1)                # Load a character from key
     	beqz $t5, reset_key          # If null terminator, reset key index
 
@@ -101,7 +102,7 @@ lower:
     	addi $t1, $t1, 1             # Move to the next character in key
     	j loop                       # Repeat for the next character
 upper:
-
+	bgt $t4, 90, skip	     # skip characters in the middle (non-letters)
     	lb $t5, ($t1)                # Load a character from key
     	beqz $t5, reset_key          # If null terminator, reset key index
 
