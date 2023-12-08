@@ -1,71 +1,8 @@
-# Vigenere Cipher in MIPS Assembly
-# The Gamblers - Joshua Estrada & Damian Varela
-
-# Rules
-# message can be in any case
-# key must be uppercase, if not, convert to uppercase
-# ignore spaces and special characters in the message
-
-.include "utils.asm"
 .globl decryption
 
 .data
-filePrompt: .asciiz "Enter the input file name: "
-keyPrompt: .asciiz "Enter a key containing only letters (Max 50 chars): "
-newLine: .asciiz "\n"
-buffer: .space 51
-fin: .space 26
-file: .space 501
-fileError: .asciiz "Error opening the file. Please check the file name and try again."
-plaintextText: .asciiz "The original plaintext is:\n\n"
-keyText: .asciiz "The key is: "
-ciphertextText: .asciiz "The ciphertext is:\n\n"
-divider: .asciiz "----------------------------------------------------------"
 
 .text
-main:
-	getFile
-   	getKey
-   	la $s0, buffer
-   	processKey($s0)
-   	printStr(newLine)
-
-	printStr(plaintextText)
-
-	# Print file contents
-    	li $v0, 4		
-    	la $a0, file            
-    	syscall
-
- 	printStr(newLine)
- 	printStr(divider)
- 	printStr(newLine)
-	printStr(keyText)
-
-	# print key
-    	li $v0, 4                    # System call for print_str
-    	move $a0, $s0                  # Load key address
-    	syscall
-    
-    # Print original plaintext and key
-	printStr(newLine)
-	printStr(divider)
-	printStr(newLine)
-	printStr(ciphertextText)
-
-    	la $a0, file          # Load plaintext address
-    	move $a1, $s0                  # Load key address
-    	jal decryption                # Call the vigenere function
-
-    # Print encrypted plaintext
-    	li $v0, 4                    # System call for print_str
-    	la $a0, file            # Load encrypted plaintext address
-    	syscall
-
-    # Exit program
-    	li $v0, 10                   # System call for exit
-    	syscall
-
 decryption:
     move $t0, $a0                # Copy ciphertext address
     move $t1, $a1                # Copy key address
