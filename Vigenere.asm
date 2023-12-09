@@ -22,6 +22,8 @@ plaintextText: .asciiz "The original plaintext is:\n\n"
 keyText: .asciiz "The key is: "
 ciphertextText: .asciiz "The ciphertext is:\n\n"
 divider: .asciiz "----------------------------------------------------------"
+encryptFile: .asciiz "encryptOutput.txt"
+decryptFile: .asciiz "decryptOutput.txt"
 
 .text
 main:
@@ -80,6 +82,7 @@ select_encryption:
     	syscall
     	
     	printStr(newLine)
+    	encryptOutput
     	j exit
     	
 select_decryption:
@@ -91,6 +94,8 @@ select_decryption:
     	li $v0, 4                    # System call for print_str
     	la $a0, file            # Load encrypted plaintext address
     	syscall
+    	
+    	decryptOutput
     	
 
 exit:

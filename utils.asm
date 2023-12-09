@@ -1,4 +1,3 @@
-# defines a macro that gets a key from the user
 .macro getKey
 	printStr(keyPrompt)
 	li $v0, 8
@@ -7,8 +6,6 @@
 	syscall
 .end_macro
 
-# defines a macro that gets a file name from the user
-# also opens the file and reprompts if file not found
 .macro getFile
 prompt:
     	# Prompt for file name
@@ -20,7 +17,7 @@ prompt:
     	li $a1, 25
     	syscall
 	la $t0, fin
-	process($t0) # processes file name by removing newlines
+	process($t0)
 open_file:
     	# Open the file for reading
     	li $v0, 13
@@ -31,7 +28,7 @@ open_file:
     	move $s1, $v0  # Save the file descriptor
 
     	# Check if file opened successfully
-   	bltz $s1, file_open_failed
+   	 bltz $s1, file_open_failed
 
     	# Read from the file
     	li $v0, 14
@@ -46,7 +43,6 @@ open_file:
     	syscall
     	j done
 
-# reprompts user for file name if failed
 file_open_failed:
 	printStr(fileError)
 	printStr(newLine)
@@ -56,9 +52,9 @@ done:
 .end_macro
 
 
-# defines a macro that converts the key to upper case
+
 .macro processKey(%key)
-    	process(%key) # processes key by removing newlines
+    	process(%key)
     	move $a0, %key
 
 convert_loop:
@@ -85,14 +81,12 @@ convert_exit:
     	# End of string, return
 .end_macro
 
-# defines a macro that prints a string
 .macro printStr(%str)
 	li $v0, 4
 	la $a0, %str
 	syscall
 .end_macro
 
-# defines a macro that processes a string by removing its newlines
 .macro process(%key)
     	move $t0, %key
 loop:
@@ -109,3 +103,46 @@ continue_loop:
 
 done_processing:
 .end_macro
+
+.macro encryptOutput
+
+    	# Open the file for reading
+    	li $v0, 13
+    	la $a0, encryptFile
+    	li $a1, 1
+    	syscall
+    	move $s3, $v0  # Save the file descriptor
+
+	li $v0, 15
+	move $a0, $s3
+	la $a1, file
+	li $a2, 500
+	syscall
+	
+	li $v0, 16
+	move $a0, $s3
+	syscall
+    	
+.end_macro
+
+.macro decryptOutput
+
+    	# Open the file for reading
+    	li $v0, 13
+    	la $a0, decryptFile
+    	li $a1, 1
+    	syscall
+    	move $s3, $v0  # Save the file descriptor
+
+	li $v0, 15
+	move $a0, $s3
+	la $a1, file
+	li $a2, 500
+	syscall
+	
+	li $v0, 16
+	move $a0, $s3
+	syscall
+    	
+.end_macro
+	
