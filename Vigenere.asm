@@ -1,4 +1,6 @@
 # Vigenere Cipher in MIPS Assembly
+# Joshua Estrada and Damian Varela
+# https://github.com/CS2640Assignments/Vigenere-Cipher
 
 # Rules
 # message can be in any case
